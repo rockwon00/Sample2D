@@ -35,7 +35,7 @@ public class PlayerMove : MonoBehaviour
         //direction sprite
         if (Input.GetButton("Horizontal"))
             spriteRenderer.flipX = Input.GetAxisRaw("Horizontal") == -1;
-        
+
         //animation
         if (Mathf.Abs(rigid.velocity.x) < 0.3)
             anim.SetBool("isWalking", false);
@@ -47,7 +47,7 @@ public class PlayerMove : MonoBehaviour
     {
         //move speed
         float h = Input.GetAxisRaw("Horizontal");
-        rigid.AddForce(Vector2.right * h*2, ForceMode2D.Impulse);
+        rigid.AddForce(Vector2.right * h * 2, ForceMode2D.Impulse);
 
         //max speed
         if (rigid.velocity.x > maxSpeed)
@@ -69,5 +69,27 @@ public class PlayerMove : MonoBehaviour
             }
         }
     }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(collision.gameObject.tag == "Enemy")
+        {
+            OnDamege(collision.transform.position);
+                Debug.Log("플레이어가 맞았습니다!");
+        }
     }
+
+    void OnDamege(Vector2 targetPos)
+    {
+        //change layer 
+        gameObject.layer = 11;
+
+        //view alpha
+        spriteRenderer.color = new Color(1, 1, 1, 0.4f);
+
+        //Reaction Force
+        int dirc = transform.position.x - targetPos.x > 0 ? 1 : -1;
+        rigid.AddForce(new Vector2(dirc, 1) * 7, ForceMode2D.Impulse);
+    }
+}
 
