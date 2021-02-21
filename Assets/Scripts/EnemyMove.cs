@@ -7,6 +7,7 @@ public class EnemyMove : MonoBehaviour
     Rigidbody2D rigid; //변수 선언
     Animator anim;
     SpriteRenderer spriteRenderer;
+    CapsuleCollider2D capsuleCollider2D;
     public int nextMove;
 
     void Awake() //awake에서 변수 초기화
@@ -15,6 +16,8 @@ public class EnemyMove : MonoBehaviour
         anim = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         Invoke("Think", 2);
+        capsuleCollider2D = GetComponent<CapsuleCollider2D>();
+
     }
 
     void FixedUpdate() //물리기반 업데이트
@@ -57,5 +60,25 @@ public class EnemyMove : MonoBehaviour
         spriteRenderer.flipX = nextMove == 1;
         CancelInvoke();
         Invoke("Think", 2);
+    }
+
+    public void OnDamaged()
+    {
+        //Sprite Alpha
+        spriteRenderer.color = new Color(1, 1, 1, 0.4f);
+        //Sprite Flip Y
+        spriteRenderer.flipY= true;
+        //Collider Disable
+        capsuleCollider2D.enabled = false;
+        //Die Effect Jump
+        rigid.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
+        //Destroy
+        Invoke("DeActive", 5);
+
+    }
+
+    void DeActive()
+    {
+        gameObject.SetActive(false);
     }
 }
