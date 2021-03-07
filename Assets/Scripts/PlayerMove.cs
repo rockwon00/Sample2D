@@ -82,10 +82,22 @@ public class PlayerMove : MonoBehaviour
             Debug.Log("플레이어가 맞았습니다!");
         }
     }
-        void OnAttack(Transform enemy)
-        {
-            //Point
 
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "Item")
+        {
+            //point
+            //deactive Item
+            collision.gameObject.SetActive(false);
+        }
+    }
+
+    void OnAttack(Transform enemy)
+        {
+        //Point
+        //reaction force
+        rigid.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
             //Enemy Die
             EnemyMove enemyMove = enemy.GetComponent<EnemyMove>();
             enemyMove.OnDamaged();
