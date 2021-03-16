@@ -11,13 +11,16 @@ public class PlayerMove : MonoBehaviour
     Rigidbody2D rigid;
     SpriteRenderer spriteRenderer;
     Animator anim;
-    CapsuleCollider2D capsuleCollider2D;
+    CapsuleCollider2D capsuleCollider;
     
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
+        capsuleCollider = GetComponent<CapsuleCollider2D>();
+
+
     }
 
     void Update()
@@ -154,8 +157,8 @@ public class PlayerMove : MonoBehaviour
         spriteRenderer.color = new Color(1, 1, 1, 0.4f);
         //Sprite Flip Y
         spriteRenderer.flipY = true;
-        //Collider Disable
-        capsuleCollider2D.enabled = false;
+        //Collider Disable 
+        capsuleCollider.enabled = false;
         //Die Effect Jump
         rigid.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
     }

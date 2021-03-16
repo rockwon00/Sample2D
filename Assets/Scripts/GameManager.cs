@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
 
     public void HealthDown()
     {
-        if (health > 1)
+        if (health > 0)
             health--;
         else
         {
