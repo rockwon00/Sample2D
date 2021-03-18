@@ -9,17 +9,37 @@ public class GameManager : MonoBehaviour
     public int stageIndex;
     public int health;
     public PlayerMove player;
+    public GameObject[] Stages;
 
     public void NextStage()
     {
-        stageIndex += stageIndex;
+        //Stage Change
+        if (stageIndex < Stages.Length - 1)
+        {
+            Stages[stageIndex].SetActive(false);
+            stageIndex++;
+            Stages[stageIndex].SetActive(true);
+            PlayerReposition();
+        }
+        else
+        {
+            //Game Clear
+            //Player Control Lock;
+            Time.timeScale = 0;
+            //Result UI
+            Debug.Log("게임 ㅋㅋ!");
+            //Restart Button UI
+        }
+
+
+        //Calculate Point
         totalPoint += stagePoint;
         stagePoint = 0;
     }
 
     public void HealthDown()
     {
-        if (health > 0)
+        if (health > 1)
             health--;
         else
         {
@@ -34,11 +54,21 @@ public class GameManager : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "Player")
-            HealthDown();
+        {
 
-        //Player Reposition
-        collision.attachedRigidbody.velocity = Vector2.zero;
-        collision.transform.position = new Vector2(0, 0);
+            //Player Reposition
+            if (health > 1)
+                PlayerReposition();
 
+
+        }
+        HealthDown();
     }
+    
+    void PlayerReposition()
+    {
+        player.transform.position = new Vector3(0, 0, -1);
+        player.VelocityZero();
+    }
+
 }

@@ -162,6 +162,12 @@ public class PlayerMove : MonoBehaviour
         //Die Effect Jump
         rigid.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
     }
+
+    public void VelocityZero()
+    {
+        rigid.velocity = Vector2.zero;
     }
+
+}
 
 
