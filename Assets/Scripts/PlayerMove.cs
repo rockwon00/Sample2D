@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+//using UnityEngine.Audio;
 
 public class PlayerMove : MonoBehaviour
 {
@@ -8,20 +9,55 @@ public class PlayerMove : MonoBehaviour
     public GameManager gameManager;
     public float maxSpeed;
     public float jumpPower;
+    public AudioClip audioJump;
+    public AudioClip audioAttack;
+    public AudioClip audioDamage;
+    public AudioClip audioItem;
+    public AudioClip audioDie;
+    public AudioClip audioFinish;
+
     Rigidbody2D rigid;
     SpriteRenderer spriteRenderer;
     Animator anim;
     CapsuleCollider2D capsuleCollider;
-    
+    AudioSource audiosource;
+
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
         capsuleCollider = GetComponent<CapsuleCollider2D>();
-
+        audiosource = GetComponent<AudioSource>();
 
     }
+
+    public void PlaySound(string action)
+    {
+        switch (action)
+        {
+            case "JUMP":
+                audiosource.clip = audioJump;
+                break;
+            case "ATTACK":
+                audiosource.clip = audioAttack;
+                break;
+            case "DAMAGED":
+                audiosource.clip = audioDamage;
+                break;
+            case "ITEM":
+                audiosource.clip = audioItem;
+                break;
+            case "DIE":
+                audiosource.clip = audioDie;
+                break;
+            case "FINISH":
+                audiosource.clip = audioFinish;
+                break;
+        }
+        audiosource.Play();
+    }
+
 
     void Update()
     {
@@ -30,6 +66,7 @@ public class PlayerMove : MonoBehaviour
         {
             rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
             anim.SetBool("isJumping", true);
+            PlaySound("JUMP");
         }
 
         //stop speed
@@ -81,9 +118,13 @@ public class PlayerMove : MonoBehaviour
         {
             //몬스터 보다 위에 있고, 아래로 낙하 중 = 밟음 (공격)
             if (rigid.velocity.y < 0 && transform.position.y > collision.transform.position.y)
+            {
                 OnAttack(collision.transform);
+                PlaySound("ATTACK");
+            }
             else
                 OnDamege(collision.transform.position);
+            PlaySound("DAMAGED");
             Debug.Log("플레이어가 맞았습니다!");
         }
     }
@@ -98,12 +139,13 @@ public class PlayerMove : MonoBehaviour
             bool isGold = collision.gameObject.name.Contains("Gold");
 
             if (isBronze)
-              gameManager.stagePoint += 50;
-            else if(isSilver)
+                gameManager.stagePoint += 50;
+            else if (isSilver)
                 gameManager.stagePoint += 100;
-            else if(isGold)
+            else if (isGold)
                 gameManager.stagePoint += 150;
-            
+            PlaySound("ITEM");
+
 
             //deactive Item
             collision.gameObject.SetActive(false);
@@ -111,45 +153,45 @@ public class PlayerMove : MonoBehaviour
         else if (collision.gameObject.tag == "Finish")
         {
             //next stage
+            PlaySound("FINISH");
             gameManager.NextStage();
         }
     }
 
     void OnAttack(Transform enemy)
-        {
+    {
         //Point
         gameManager.stagePoint += 100;
         //reaction force
         rigid.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
-            //Enemy Die
-            EnemyMove enemyMove = enemy.GetComponent<EnemyMove>();
-            enemyMove.OnDamaged();
-        }
+        //Enemy Die
+        EnemyMove enemyMove = enemy.GetComponent<EnemyMove>();
+        enemyMove.OnDamaged();
+    }
 
-        void OnDamege(Vector2 targetPos)
-        {
+    void OnDamege(Vector2 targetPos)
+    {
         //health Down
-            gameManager.HealthDown();
-            //change layer 
-            gameObject.layer = 11;
+        gameManager.HealthDown();
+        //change layer 
+        gameObject.layer = 11;
 
-            //view alpha
-            spriteRenderer.color = new Color(1, 1, 1, 0.4f);
+        //view alpha
+        spriteRenderer.color = new Color(1, 1, 1, 0.4f);
 
-            //Reaction Force
-            int dirc = transform.position.x - targetPos.x > 0 ? 1 : -1;
-            rigid.AddForce(new Vector2(dirc, 1) * 7, ForceMode2D.Impulse);
+        //Reaction Force
+        int dirc = transform.position.x - targetPos.x > 0 ? 1 : -1;
+        rigid.AddForce(new Vector2(dirc, 1) * 7, ForceMode2D.Impulse);
+        Invoke("OffDamage", 3);
 
-            Invoke("OffDamage", 3);
+    }
 
-        }
+    void OffDamage()
+    {
+        gameObject.layer = 10;
+        spriteRenderer.color = new Color(1, 1, 1, 1);
 
-        void OffDamage()
-        {
-            gameObject.layer = 10;
-            spriteRenderer.color = new Color(1, 1, 1, 1);
-
-        }
+    }
 
     public void OnDie()
     {
